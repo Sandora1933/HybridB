@@ -5,12 +5,14 @@
   "properties": {
     "Commons category": {
       "property_id": "P373",
+      "datatype": "string",
       "values": [
         "Battle of Leipzig"
       ]
     },
     "coordinate location": {
       "property_id": "P625",
+      "datatype": "globe-coordinate",
       "values": [
         {
           "latitude": 51.312222222222225,
@@ -22,6 +24,7 @@
     },
     "instance of": {
       "property_id": "P31",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q178561",
@@ -31,12 +34,14 @@
     },
     "image": {
       "property_id": "P18",
+      "datatype": "commonsMedia",
       "values": [
         "Battle of Leipzig MKL Bd. 10 1890 (128443424).jpg"
       ]
     },
     "country": {
       "property_id": "P17",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q153015",
@@ -50,6 +55,7 @@
     },
     "location": {
       "property_id": "P276",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q2079",
@@ -59,6 +65,7 @@
     },
     "described by source": {
       "property_id": "P1343",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q602358",
@@ -84,6 +91,7 @@
     },
     "start time": {
       "property_id": "P580",
+      "datatype": "time",
       "values": [
         {
           "time": "+1813-10-16T00:00:00Z",
@@ -94,6 +102,7 @@
     },
     "end time": {
       "property_id": "P582",
+      "datatype": "time",
       "values": [
         {
           "time": "+1813-10-19T00:00:00Z",
@@ -104,6 +113,7 @@
     },
     "part of": {
       "property_id": "P361",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q814235",
@@ -113,6 +123,7 @@
     },
     "order of battle": {
       "property_id": "P4220",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q3355559",
@@ -126,12 +137,14 @@
     },
     "spoken text audio": {
       "property_id": "P989",
+      "datatype": "commonsMedia",
       "values": [
         "Es-Batalla de Leipzig-article.flac"
       ]
     },
     "participant": {
       "property_id": "P710",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q34266",
@@ -157,6 +170,7 @@
     },
     "topic's main category": {
       "property_id": "P910",
+      "datatype": "wikibase-item",
       "values": [
         {
           "id": "Q60946595",
