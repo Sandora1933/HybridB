@@ -1,0 +1,307 @@
+{
+  "id": "Q151005",
+  "label": "Battle of Leipzig",
+  "description": "huge and heavy battle during the War of the Sixth Coalition against Napoleon (1813)",
+  "properties": {
+    "Commons category": {
+      "property_id": "P373",
+      "values": [
+        "Battle of Leipzig"
+      ]
+    },
+    "BNCF Thesaurus ID": {
+      "property_id": "P508",
+      "values": [
+        "48304"
+      ]
+    },
+    "coordinate location": {
+      "property_id": "P625",
+      "values": [
+        {
+          "latitude": 51.312222222222225,
+          "longitude": 12.413333333333334,
+          "precision": 0.0002777777777777778,
+          "globe": "http://www.wikidata.org/entity/Q2"
+        }
+      ]
+    },
+    "Freebase ID": {
+      "property_id": "P646",
+      "values": [
+        "/m/012t40"
+      ]
+    },
+    "GND ID": {
+      "property_id": "P227",
+      "values": [
+        "4132970-3"
+      ]
+    },
+    "instance of": {
+      "property_id": "P31",
+      "values": [
+        {
+          "id": "Q178561",
+          "label": "battle"
+        }
+      ]
+    },
+    "image": {
+      "property_id": "P18",
+      "values": [
+        "Battle of Leipzig MKL Bd. 10 1890 (128443424).jpg"
+      ]
+    },
+    "NDL Authority ID": {
+      "property_id": "P349",
+      "values": [
+        "00567365"
+      ]
+    },
+    "country": {
+      "property_id": "P17",
+      "values": [
+        {
+          "id": "Q153015",
+          "label": "Kingdom of Saxony"
+        },
+        {
+          "id": "Q183",
+          "label": "Germany"
+        }
+      ]
+    },
+    "location": {
+      "property_id": "P276",
+      "values": [
+        {
+          "id": "Q2079",
+          "label": "Leipzig"
+        }
+      ]
+    },
+    "Library of Congress authority ID": {
+      "property_id": "P244",
+      "values": [
+        "sh85075916"
+      ]
+    },
+    "described by source": {
+      "property_id": "P1343",
+      "values": [
+        {
+          "id": "Q602358",
+          "label": "Brockhaus and Efron Encyclopedic Dictionary"
+        },
+        {
+          "id": "Q4114391",
+          "label": "Sytin Military Encyclopedia"
+        },
+        {
+          "id": "Q20078554",
+          "label": "Great Soviet Encyclopedia (1926–1947)"
+        },
+        {
+          "id": "Q19077875",
+          "label": "The American Cyclopædia"
+        },
+        {
+          "id": "Q124737630",
+          "label": "Armenian Soviet Encyclopedia, vol. 4"
+        }
+      ]
+    },
+    "start time": {
+      "property_id": "P580",
+      "values": [
+        {
+          "time": "+1813-10-16T00:00:00Z",
+          "precision": 11,
+          "calendar_model": "http://www.wikidata.org/entity/Q1985727"
+        }
+      ]
+    },
+    "end time": {
+      "property_id": "P582",
+      "values": [
+        {
+          "time": "+1813-10-19T00:00:00Z",
+          "precision": 11,
+          "calendar_model": "http://www.wikidata.org/entity/Q1985727"
+        }
+      ]
+    },
+    "part of": {
+      "property_id": "P361",
+      "values": [
+        {
+          "id": "Q814235",
+          "label": "German campaign of 1813"
+        }
+      ]
+    },
+    "Encyclopædia Britannica Online ID": {
+      "property_id": "P1417",
+      "values": [
+        "event/Battle-of-Leipzig"
+      ]
+    },
+    "order of battle": {
+      "property_id": "P4220",
+      "values": [
+        {
+          "id": "Q3355559",
+          "label": "French order of battle during the Battle of Leipzig"
+        },
+        {
+          "id": "Q3355545",
+          "label": "order of battle of the coalition during the Battle of Leipzig"
+        }
+      ]
+    },
+    "Great Russian Encyclopedia Online ID (2017)": {
+      "property_id": "P2924",
+      "values": [
+        "2137917"
+      ]
+    },
+    "NL CR AUT ID": {
+      "property_id": "P691",
+      "values": [
+        "ph456970"
+      ]
+    },
+    "spoken text audio": {
+      "property_id": "P989",
+      "values": [
+        "Es-Batalla de Leipzig-article.flac"
+      ]
+    },
+    "Latvian National Encyclopedia Online ID": {
+      "property_id": "P6870",
+      "values": [
+        "1668"
+      ]
+    },
+    "J9U entity ID": {
+      "property_id": "P8189",
+      "values": [
+        "987007563036305171"
+      ]
+    },
+    "Krugosvet article (archived)": {
+      "property_id": "P6385",
+      "values": [
+        "voennoe-delo/leiptsigskoe-srazhenie"
+      ]
+    },
+    "Image Archive, Herder Institute": {
+      "property_id": "P6482",
+      "values": [
+        "Q151005"
+      ]
+    },
+    "National Historical Museums of Sweden ID": {
+      "property_id": "P9495",
+      "values": [
+        "histevent/8D356F03-CD22-4867-B0C1-549A9F8FC099",
+        "histevent/CA18617C-EDF6-4F41-9B6B-86C6B59DE40B"
+      ]
+    },
+    "BHCL UUID": {
+      "property_id": "P9037",
+      "values": [
+        "03e380c2-7001-48fc-b57b-fd71678ff228"
+      ]
+    },
+    "DigitaltMuseum ID": {
+      "property_id": "P7847",
+      "values": [
+        "029996972464"
+      ]
+    },
+    "KulturNav-ID": {
+      "property_id": "P1248",
+      "values": [
+        "ba0b6cc8-9349-4691-a39e-dbb12c6bc2ca"
+      ]
+    },
+    "Encyclopedia of China (Third Edition) ID": {
+      "property_id": "P10565",
+      "values": [
+        "125120"
+      ]
+    },
+    "museum-digital tag ID": {
+      "property_id": "P12596",
+      "values": [
+        "6634"
+      ]
+    },
+    "Great Russian Encyclopedia portal ID": {
+      "property_id": "P11514",
+      "values": [
+        "leiptsigskoe-srazhenie-1813-b29977"
+      ]
+    },
+    "FactGrid item ID": {
+      "property_id": "P8168",
+      "values": [
+        "Q701995"
+      ]
+    },
+    "‎Yale LUX ID": {
+      "property_id": "P13591",
+      "values": [
+        "concept/dc48e2c2-16c1-4626-a19d-57fe59abfde0"
+      ]
+    },
+    "Dewey Decimal Classification": {
+      "property_id": "P1036",
+      "values": [
+        "940.2742094321"
+      ]
+    },
+    "participant": {
+      "property_id": "P710",
+      "values": [
+        {
+          "id": "Q34266",
+          "label": "Russian Empire"
+        },
+        {
+          "id": "Q71084",
+          "label": "First French Empire"
+        },
+        {
+          "id": "Q131964",
+          "label": "Austrian Empire"
+        },
+        {
+          "id": "Q27306",
+          "label": "Kingdom of Prussia"
+        },
+        {
+          "id": "Q34",
+          "label": "Sweden"
+        }
+      ]
+    },
+    "topic's main category": {
+      "property_id": "P910",
+      "values": [
+        {
+          "id": "Q60946595",
+          "label": "Category:Battle of Leipzig"
+        }
+      ]
+    },
+    "Wellcome Collection concept ID": {
+      "property_id": "P13204",
+      "values": [
+        "qqajq2sa"
+      ]
+    }
+  }
+}
