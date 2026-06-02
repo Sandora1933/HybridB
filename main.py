@@ -301,7 +301,9 @@ def save_json_to_file(data, output_file):
 
 
 if __name__ == "__main__":
-    entity_id = "Q151005"
+    #entity_id = "Q151005" # Battle of Leipzig
+    #entity_id = "Q179591"   # Battle of Cannae
+    entity_id = "Q83224"    # Battle of Hastings      
 
     print(f"Retrieving entity {entity_id}...")
     page = retrieve_wikidata_page_by_id(entity_id)
@@ -312,9 +314,9 @@ if __name__ == "__main__":
     simplified = simplify_entity(entity)
 
     print("Saving JSON to files...")
-    save_json_to_file(entity, "Q151005_basic.json")
-    save_json_to_file(simplified, "Q151005_simplified.json")
-    save_json_to_file(properties, "Q151005_properties.json")
+    save_json_to_file(entity, f"extracted/{entity_id}_basic.json")
+    save_json_to_file(simplified, f"extracted/{entity_id}_simplified.json")
+    save_json_to_file(properties, f"extracted/{entity_id}_properties.json")
 
     properties = get_all_properties(entity)
     print(f"Found {len(properties)} statement properties:")

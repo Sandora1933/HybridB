@@ -54,5 +54,29 @@
   "P910": {
     "label": "topic's main category",
     "datatype": "wikibase-item"
+  },
+  "P585": {
+    "label": "point in time",
+    "datatype": "time"
+  },
+  "P242": {
+    "label": "locator map image",
+    "datatype": "commonsMedia"
+  },
+  "P1889": {
+    "label": "different from",
+    "datatype": "wikibase-item"
+  },
+  "P1132": {
+    "label": "number of participants",
+    "datatype": "quantity"
+  },
+  "P7959": {
+    "label": "historic county",
+    "datatype": "wikibase-item"
+  },
+  "P5008": {
+    "label": "on focus list of Wikimedia project",
+    "datatype": "wikibase-item"
   }
 }
