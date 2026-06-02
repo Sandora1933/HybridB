@@ -1,0 +1,58 @@
+[
+  {
+    "property_id": "P373",
+    "property_name": "Commons category"
+  },
+  {
+    "property_id": "P625",
+    "property_name": "coordinate location"
+  },
+  {
+    "property_id": "P31",
+    "property_name": "instance of"
+  },
+  {
+    "property_id": "P18",
+    "property_name": "image"
+  },
+  {
+    "property_id": "P17",
+    "property_name": "country"
+  },
+  {
+    "property_id": "P276",
+    "property_name": "location"
+  },
+  {
+    "property_id": "P1343",
+    "property_name": "described by source"
+  },
+  {
+    "property_id": "P580",
+    "property_name": "start time"
+  },
+  {
+    "property_id": "P582",
+    "property_name": "end time"
+  },
+  {
+    "property_id": "P361",
+    "property_name": "part of"
+  },
+  {
+    "property_id": "P4220",
+    "property_name": "order of battle"
+  },
+  {
+    "property_id": "P989",
+    "property_name": "spoken text audio"
+  },
+  {
+    "property_id": "P710",
+    "property_name": "participant"
+  },
+  {
+    "property_id": "P910",
+    "property_name": "topic's main category"
+  }
+]

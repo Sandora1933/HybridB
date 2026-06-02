@@ -9,12 +9,6 @@
         "Battle of Leipzig"
       ]
     },
-    "BNCF Thesaurus ID": {
-      "property_id": "P508",
-      "values": [
-        "48304"
-      ]
-    },
     "coordinate location": {
       "property_id": "P625",
       "values": [
@@ -24,18 +18,6 @@
           "precision": 0.0002777777777777778,
           "globe": "http://www.wikidata.org/entity/Q2"
         }
-      ]
-    },
-    "Freebase ID": {
-      "property_id": "P646",
-      "values": [
-        "/m/012t40"
-      ]
-    },
-    "GND ID": {
-      "property_id": "P227",
-      "values": [
-        "4132970-3"
       ]
     },
     "instance of": {
@@ -51,12 +33,6 @@
       "property_id": "P18",
       "values": [
         "Battle of Leipzig MKL Bd. 10 1890 (128443424).jpg"
-      ]
-    },
-    "NDL Authority ID": {
-      "property_id": "P349",
-      "values": [
-        "00567365"
       ]
     },
     "country": {
@@ -79,12 +55,6 @@
           "id": "Q2079",
           "label": "Leipzig"
         }
-      ]
-    },
-    "Library of Congress authority ID": {
-      "property_id": "P244",
-      "values": [
-        "sh85075916"
       ]
     },
     "described by source": {
@@ -141,12 +111,6 @@
         }
       ]
     },
-    "Encyclopædia Britannica Online ID": {
-      "property_id": "P1417",
-      "values": [
-        "event/Battle-of-Leipzig"
-      ]
-    },
     "order of battle": {
       "property_id": "P4220",
       "values": [
@@ -160,107 +124,10 @@
         }
       ]
     },
-    "Great Russian Encyclopedia Online ID (2017)": {
-      "property_id": "P2924",
-      "values": [
-        "2137917"
-      ]
-    },
-    "NL CR AUT ID": {
-      "property_id": "P691",
-      "values": [
-        "ph456970"
-      ]
-    },
     "spoken text audio": {
       "property_id": "P989",
       "values": [
         "Es-Batalla de Leipzig-article.flac"
-      ]
-    },
-    "Latvian National Encyclopedia Online ID": {
-      "property_id": "P6870",
-      "values": [
-        "1668"
-      ]
-    },
-    "J9U entity ID": {
-      "property_id": "P8189",
-      "values": [
-        "987007563036305171"
-      ]
-    },
-    "Krugosvet article (archived)": {
-      "property_id": "P6385",
-      "values": [
-        "voennoe-delo/leiptsigskoe-srazhenie"
-      ]
-    },
-    "Image Archive, Herder Institute": {
-      "property_id": "P6482",
-      "values": [
-        "Q151005"
-      ]
-    },
-    "National Historical Museums of Sweden ID": {
-      "property_id": "P9495",
-      "values": [
-        "histevent/8D356F03-CD22-4867-B0C1-549A9F8FC099",
-        "histevent/CA18617C-EDF6-4F41-9B6B-86C6B59DE40B"
-      ]
-    },
-    "BHCL UUID": {
-      "property_id": "P9037",
-      "values": [
-        "03e380c2-7001-48fc-b57b-fd71678ff228"
-      ]
-    },
-    "DigitaltMuseum ID": {
-      "property_id": "P7847",
-      "values": [
-        "029996972464"
-      ]
-    },
-    "KulturNav-ID": {
-      "property_id": "P1248",
-      "values": [
-        "ba0b6cc8-9349-4691-a39e-dbb12c6bc2ca"
-      ]
-    },
-    "Encyclopedia of China (Third Edition) ID": {
-      "property_id": "P10565",
-      "values": [
-        "125120"
-      ]
-    },
-    "museum-digital tag ID": {
-      "property_id": "P12596",
-      "values": [
-        "6634"
-      ]
-    },
-    "Great Russian Encyclopedia portal ID": {
-      "property_id": "P11514",
-      "values": [
-        "leiptsigskoe-srazhenie-1813-b29977"
-      ]
-    },
-    "FactGrid item ID": {
-      "property_id": "P8168",
-      "values": [
-        "Q701995"
-      ]
-    },
-    "‎Yale LUX ID": {
-      "property_id": "P13591",
-      "values": [
-        "concept/dc48e2c2-16c1-4626-a19d-57fe59abfde0"
-      ]
-    },
-    "Dewey Decimal Classification": {
-      "property_id": "P1036",
-      "values": [
-        "940.2742094321"
       ]
     },
     "participant": {
@@ -295,12 +162,6 @@
           "id": "Q60946595",
           "label": "Category:Battle of Leipzig"
         }
-      ]
-    },
-    "Wellcome Collection concept ID": {
-      "property_id": "P13204",
-      "values": [
-        "qqajq2sa"
       ]
     }
   }
