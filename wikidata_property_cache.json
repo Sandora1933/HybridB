@@ -78,5 +78,9 @@
   "P5008": {
     "label": "on focus list of Wikimedia project",
     "datatype": "wikibase-item"
+  },
+  "P156": {
+    "label": "followed by",
+    "datatype": "wikibase-item"
   }
 }

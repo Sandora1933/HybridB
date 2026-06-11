@@ -303,7 +303,9 @@ def save_json_to_file(data, output_file):
 if __name__ == "__main__":
     #entity_id = "Q151005" # Battle of Leipzig
     #entity_id = "Q179591"   # Battle of Cannae
-    entity_id = "Q83224"    # Battle of Hastings      
+    #entity_id = "Q83224"    # Battle of Hastings      
+    #entity_id = "Q7222682"    # Second Turkish Siege of Vienna
+    entity_id = "Q200056"    # Battle of Zama
 
     print(f"Retrieving entity {entity_id}...")
     page = retrieve_wikidata_page_by_id(entity_id)
