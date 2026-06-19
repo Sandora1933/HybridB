@@ -2,3 +2,6 @@
 extracted_wikidata/
 extracted_wikipedia/
 __pycache__/
+.env
+data/
+results/
