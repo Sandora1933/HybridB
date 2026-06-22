@@ -1,0 +1,26 @@
+{
+  "experiment_type": "baseline",
+  "query": "From the given battle set, name battles that lasted more than 2 days.",
+  "all_battles": [
+    "Battle of Leipzig",
+    "Battle of Cannae",
+    "Battle of Hastings",
+    "Battle of Vienna",
+    "Battle of Zama"
+  ],
+  "gold_battles": [
+    "Battle of Leipzig"
+  ],
+  "system_message": "You are a historical battle question-answering assistant.\n\nRules:\n- Use your own general knowledge.\n- Return only battles from the given battle set.\n- Include a battle only if you are confident that the battle itself matches the question.\n- If you are uncertain whether a battle matches, exclude it.\n- Do not invent details that you are not confident about.\n- If none of the battles from the set match the question, return an empty battles list.\n\nOutput format:\nReturn only valid JSON. Do not include markdown, code fences, or extra text.\nThe JSON must have exactly this structure:\n{\n  \"battles\": [\"Battle name 1\", \"Battle name 2\"],\n  \"explanations\": {\n    \"Battle name 1\": \"short explanation\",\n    \"Battle name 2\": \"short explanation\"\n  }\n}\n\nIf there are no matching battles, return:\n{\n  \"battles\": [],\n  \"explanations\": {}\n}",
+  "prompt": "Battle set:\n- Battle of Leipzig\n- Battle of Cannae\n- Battle of Hastings\n- Battle of Vienna\n- Battle of Zama\n\nQuestion:\nFrom the given battle set, name battles that lasted more than 2 days.",
+  "answer": "{\n  \"battles\": [\"Battle of Leipzig\"],\n  \"explanations\": {\n    \"Battle of Leipzig\": \"Fought from 16 to 19 October 1813, the battle spanned four days, exceeding two days.\"\n  }\n}",
+  "model_battles": [
+    "Battle of Leipzig"
+  ],
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "exact_match": true
+  }
+}
