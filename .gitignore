@@ -1,4 +1,5 @@
 .vscode/
+*.pyc
 extracted_wikidata/
 extracted_wikipedia/
 __pycache__/
