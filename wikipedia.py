@@ -32,9 +32,9 @@ def retrieve_wikipedia_page(
 
 
 if __name__ == "__main__":
-    page_title = "Battle_of_Vienna"
+    page_title = "Battle_of_Klushino"
     language = "en"
-    file_to_save = "extracted_wikipedia/battle_of_vienna.txt"
+    file_to_save = "extracted_wikipedia/battle_of_klushino_raw.txt"
 
     try:
         page_data = retrieve_wikipedia_page(page_title, language)
