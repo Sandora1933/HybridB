@@ -5,3 +5,4 @@ extracted_wikipedia/
 __pycache__/
 .env
 data/
+old_data/

@@ -11,7 +11,7 @@ def retrieve_wikipedia_page(
     language="en"
 ):
     wiki = wikipediaapi.Wikipedia(
-        user_agent="BattleRetriever/1.0 (vlad8aromanov@gmail.com)",
+        user_agent="BattleRetriever/1.0 (vladyslav.romanov@tu-dresden.de)",
         language=language
     )
 
@@ -34,7 +34,7 @@ def retrieve_wikipedia_page(
 if __name__ == "__main__":
     page_title = "Battle_of_Klushino"
     language = "en"
-    file_to_save = "extracted_wikipedia/battle_of_klushino_raw.txt"
+    file_to_save = "data/extracted_wikipedia/battle_of_klushino_raw.txt"
 
     try:
         page_data = retrieve_wikipedia_page(page_title, language)

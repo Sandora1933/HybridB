@@ -14,19 +14,14 @@ OUTPUT_CSV = Path("data/wikidata_battles.csv")
 HEADERS = {
     "User-Agent": (
         "HistoricalBattlesThesis/1.0 "
-        "(Master thesis; contact: your-email@example.com)"
+        "(Master thesis; contact: vladyslav.romanov@tu-dresden.de)"
     ),
     "Accept": "application/sparql-results+json",
 }
 
 QUERY = """
 SELECT DISTINCT ?item ?wikipediaArticle WHERE {
-  VALUES ?eventType {
-    wd:Q178561
-    wd:Q188055
-  }
-
-  ?item wdt:P31 ?eventType.
+  ?item wdt:P31 wd:Q178561.
 
   ?wikipediaArticle schema:about ?item;
                     schema:isPartOf <https://en.wikipedia.org/>.
@@ -56,9 +51,11 @@ def execute_query(
                 retry_after = int(
                     response.headers.get("Retry-After", "10")
                 )
+
                 print(
                     f"Rate limited. Waiting {retry_after} seconds..."
                 )
+
                 time.sleep(retry_after)
                 continue
 
@@ -135,7 +132,7 @@ def save_csv(
 
 
 def main() -> None:
-    print("Querying direct instances of battle and siege...")
+    print("Querying direct instances of battle...")
 
     with requests.Session() as session:
         result = execute_query(session, QUERY)
