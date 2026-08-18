@@ -1,13 +1,16 @@
 from __future__ import annotations
 import csv
-from time import perf_counter
+import time
 
 import re
 from pathlib import Path
 from urllib.parse import unquote
 
 import wikipediaapi
+from wikipediaapi.exceptions import WikiConnectionError
 
+NUMBER_OF_BATTLES = 11561
+REQUEST_DELAY_SECONDS = 0.35
 
 USER_AGENT = (
     "BattleRetriever/1.0 "
@@ -177,7 +180,7 @@ def retrieve_wikipedia_page(
 
 
 def main() -> None:
-    battle_limit = 10
+    battle_limit = NUMBER_OF_BATTLES
 
     if not BATTLES_CSV.exists():
         raise FileNotFoundError(
@@ -210,6 +213,10 @@ def main() -> None:
             )
 
         for row_number, row in enumerate(reader, start=1):
+            start_row = 2429
+            if row_number < start_row:
+                continue
+
             if row_number > battle_limit:
                 break
 
@@ -245,11 +252,17 @@ def main() -> None:
                 print(f"Saved to: {page_data['output_file']}")
 
             except (
+                WikiConnectionError,
                 ValueError,
                 OSError,
             ) as error:
                 failed_extractions += 1
-                print(f"Extraction failed for {qid}: {error}")
+                print(
+                    f"Extraction failed for {qid}: "
+                    f"{type(error).__name__}: {error}"
+                )
+
+            time.sleep(REQUEST_DELAY_SECONDS)
 
     print()
     print("Extraction completed.")
@@ -258,11 +271,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    start = perf_counter()
-
-    try:
-        main()
-    finally:
-        end = perf_counter()
-        print(f"Execution time: {end - start:.6f} seconds")
-        
+    main()
