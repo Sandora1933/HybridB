@@ -25,6 +25,8 @@ class ScadsChatModel:
             api_key=SCADSAI_API_KEY
         )
 
+        self.models = "\n".join([model.id for model in self.client.models.list().data])
+
     def generate_response(
         self,
         user_message,

@@ -6,7 +6,7 @@ from typing import Any
 
 
 BATTLE_JSON_DIR = Path("data/json_kb_v1")
-OUTPUT_FILE = Path("data/retrieval_docs/retrieval_docs.jsonl")
+OUTPUT_FILE = Path("data/retrieval_docs/retrieval_docs_v1.jsonl")
 
 NUMBER_OF_BATTLES = None
 
