@@ -35,7 +35,7 @@ FAILED_LOG_FILE = Path(
 # ============================================================
 
 START_FILE_INDEX = 0
-NUMBER_OF_FILES: int | None = 800
+NUMBER_OF_FILES: int | None = 850
 
 REQUEST_DELAY_SECONDS = 0.7
 MAX_RETRIES = 3

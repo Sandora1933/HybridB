@@ -11,7 +11,7 @@ from llm import load_llm
 
 
 RETRIEVAL_DOCS_FILE = Path(
-    "data/retrieval_docs/retrieval_docs.jsonl"
+    "data/retrieval_docs/retrieval_docs_v1.jsonl"
 )
 
 FAISS_INDEX_FILE = Path(
@@ -319,10 +319,10 @@ def dense_search(
     model,
     index: faiss.Index,
     docs: list[dict[str, Any]],
-    top_k: int = 10,
+    candidate_k: int,
 ) -> list[dict[str, Any]]:
     """
-    Retrieve the top-k battles using dense retrieval.
+    Retrieve the candidate-k battles using dense retrieval.
     """
 
     if not query.strip():
@@ -330,13 +330,13 @@ def dense_search(
             "Query must not be empty."
         )
 
-    if top_k <= 0:
+    if candidate_k <= 0:
         raise ValueError(
-            "top_k must be greater than 0."
+            "candidate_k must be greater than 0."
         )
 
-    top_k = min(
-        top_k,
+    candidate_k = min(
+        candidate_k,
         len(docs),
     )
 
@@ -351,7 +351,7 @@ def dense_search(
 
     scores, indices = index.search(
         query_embedding,
-        top_k,
+        candidate_k,
     )
 
     results: list[dict[str, Any]] = []
@@ -405,27 +405,26 @@ def create_index() -> None:
     )
 
 
-def test_search() -> None:
+def test_search(candidate_k: int = 10) -> None:
     """
     Load the existing index and run a test query.
     """
 
     model = load_embedding_model()
-
     index, docs = load_dense_index()
 
     print(
         f"Loaded vectors: {index.ntotal}"
     )
 
-    query = "military defeats that caused the collapse of a state"
+    query = "Find battles involving war elephants where the elephants were used in the main battle but did not secure victory."
 
     results = dense_search(
         query=query,
         model=model,
         index=index,
         docs=docs,
-        top_k=10,
+        candidate_k=candidate_k,
     )
 
     print()
@@ -451,5 +450,4 @@ if __name__ == "__main__":
     #create_index()
 
     # After the index is created:
-    #
-    test_search()
+    test_search(candidate_k=30)

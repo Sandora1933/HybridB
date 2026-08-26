@@ -9,7 +9,7 @@ from rank_bm25 import BM25Okapi
 
 
 RETRIEVAL_DOCS_FILE = Path(
-    "data/retrieval_docs/retrieval_docs.jsonl"
+    "data/retrieval_docs/retrieval_docs_v1.jsonl"
 )
 
 
@@ -93,17 +93,17 @@ def retrieve_bm25(
     query: str,
     bm25: BM25Okapi,
     documents: list[dict[str, Any]],
-    top_k: int = 10,
+    candidate_k: int,
 ) -> list[dict[str, Any]]:
     """
-    Retrieve the top-k battle documents using BM25.
+    Retrieve the candidate-k battle documents using BM25.
     """
 
     if not query.strip():
         raise ValueError("Query must not be empty.")
 
-    if top_k <= 0:
-        raise ValueError("top_k must be greater than 0.")
+    if candidate_k <= 0:
+        raise ValueError("candidate_k must be greater than 0.")
 
     tokenized_query = tokenize_text(query)
 
@@ -113,7 +113,7 @@ def retrieve_bm25(
         range(len(scores)),
         key=lambda index: scores[index],
         reverse=True,
-    )[:top_k]
+    )[:candidate_k]
 
     results = []
 
@@ -137,7 +137,7 @@ def retrieve_bm25(
     return results
 
 
-def test_bm25() -> None:
+def test_bm25(candidate_k: int = 10) -> None:
     # collections of retrieval documents as jsons
     documents = load_retrieval_docs()
 
@@ -146,13 +146,13 @@ def test_bm25() -> None:
     )
 
     bm25, _ = build_bm25_index(documents)
-    query = "military defeats that caused the collapse of a state"
+    query = "Find battles involving war elephants where the elephants were used in the main battle but did not secure victory."
 
     results = retrieve_bm25(
         query=query,
         bm25=bm25,
         documents=documents,
-        top_k=10,
+        candidate_k=candidate_k,
     )
 
     print(f"\nQuery: {query}\n")
@@ -167,4 +167,4 @@ def test_bm25() -> None:
 
 
 if __name__ == "__main__":
-    test_bm25()
+    test_bm25(candidate_k=30)
