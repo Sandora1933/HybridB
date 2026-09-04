@@ -34,8 +34,8 @@ FAILED_LOG_FILE = Path(
 # Run configuration
 # ============================================================
 
-START_FILE_INDEX = 0
-NUMBER_OF_FILES: int | None = 850
+START_FILE_INDEX = 4500
+NUMBER_OF_FILES: int | None = 100 # 4600 
 
 REQUEST_DELAY_SECONDS = 0.7
 MAX_RETRIES = 3
@@ -828,10 +828,7 @@ def main() -> None:
         ]
 
     else:
-        selected_records = battle_records[
-            START_FILE_INDEX:
-            START_FILE_INDEX + NUMBER_OF_FILES
-        ]
+        selected_records = battle_records[START_FILE_INDEX:START_FILE_INDEX + NUMBER_OF_FILES]
 
     total = len(selected_records)
 
