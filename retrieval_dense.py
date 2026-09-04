@@ -10,81 +10,106 @@ import numpy as np
 from llm import load_llm
 
 
-RETRIEVAL_DOCS_FILE = Path(
-    "data/retrieval_docs/retrieval_docs_v1.jsonl"
+JSON_KB_DIR = Path(
+    "data/json_kb_v1"
 )
 
 FAISS_INDEX_FILE = Path(
-    "data/dense_index/qwen3_embedding_4b.index"
+    "data/dense_index/qwen3_embedding_4b_direct.index"
 )
 
 DOC_MAPPING_FILE = Path(
-    "data/dense_index/doc_mapping.json"
+    "data/dense_index/doc_mapping_direct.json"
 )
 
 MODEL_NAME = "Qwen/Qwen3-Embedding-4B"
 
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 
 QUERY_INSTRUCTION = (
     "Given a query about historical battles, "
-    "retrieve relevant battle descriptions."
+    "retrieve relevant battle records."
 )
 
 
-def load_retrieval_docs(
-    file_path: Path = RETRIEVAL_DOCS_FILE,
-) -> list[dict[str, Any]]:
+def json_to_text(
+    battle: dict[str, Any],
+) -> str:
     """
-    Load retrieval documents from JSONL.
+    Serialize a full battle JSON object directly as text for embedding.
+
+    No intermediate retrieval-document projection is created.
+    Compact JSON reduces unnecessary whitespace while preserving
+    all keys and values.
     """
 
-    if not file_path.exists():
+    return json.dumps(
+        battle,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+
+def load_json_battles(
+    directory: Path = JSON_KB_DIR,
+) -> list[dict[str, Any]]:
+    """
+    Load all Q*.json battle instances directly from the JSON knowledge base.
+    """
+
+    if not directory.exists():
         raise FileNotFoundError(
-            f"Retrieval docs file not found: "
-            f"{file_path.resolve()}"
+            f"JSON knowledge-base directory not found: "
+            f"{directory.resolve()}"
         )
+
+    json_files = sorted(
+        directory.glob("Q*.json"),
+        key=lambda path: int(path.stem[1:]),
+    )
 
     docs: list[dict[str, Any]] = []
 
-    with file_path.open(
-        "r",
-        encoding="utf-8",
-    ) as file:
-        for line_number, line in enumerate(
-            file,
-            start=1,
-        ):
-            line = line.strip()
+    for file_path in json_files:
+        try:
+            with file_path.open(
+                "r",
+                encoding="utf-8",
+            ) as file:
+                battle = json.load(file)
 
-            if not line:
-                continue
+        except json.JSONDecodeError as error:
+            raise ValueError(
+                f"Invalid JSON file: {file_path} "
+                f"({error})"
+            ) from error
 
-            try:
-                item = json.loads(line)
-
-            except json.JSONDecodeError as error:
-                raise ValueError(
-                    f"Invalid JSON at line {line_number}: "
-                    f"{error}"
-                ) from error
-
-            text = item.get("text")
-
-            if not isinstance(text, str) or not text.strip():
-                continue
-
-            docs.append(
-                {
-                    "battle_id": item.get("battle_id"),
-                    "name": item.get("name"),
-                    "text": text,
-                    "metadata": item.get(
-                        "metadata",
-                        {},
-                    ),
-                }
+        if not isinstance(battle, dict):
+            raise ValueError(
+                f"Expected JSON object in {file_path}, "
+                f"got {type(battle).__name__}."
             )
+
+        battle_id = file_path.stem
+
+        identification = battle.get(
+            "identification",
+            {},
+        )
+
+        if not isinstance(identification, dict):
+            identification = {}
+
+        name = identification.get("name")
+
+        docs.append(
+            {
+                "battle_id": battle_id,
+                "name": name,
+                "json": battle,
+                "text": json_to_text(battle),
+            }
+        )
 
     return docs
 
@@ -94,7 +119,9 @@ def load_embedding_model():
     Load the API client configured for Qwen3-Embedding-4B.
     """
 
-    print(f"Loading embedding model: {MODEL_NAME}")
+    print(
+        f"Loading embedding model: {MODEL_NAME}"
+    )
 
     return load_llm(
         model_name=MODEL_NAME
@@ -105,8 +132,8 @@ def normalize_embeddings(
     embeddings: np.ndarray,
 ) -> np.ndarray:
     """
-    L2-normalize embeddings so that inner product
-    corresponds to cosine similarity.
+    L2-normalize embeddings so inner product corresponds
+    to cosine similarity.
     """
 
     norms = np.linalg.norm(
@@ -141,7 +168,9 @@ def embed_texts(
         dtype="float32",
     )
 
-    return normalize_embeddings(embeddings)
+    return normalize_embeddings(
+        embeddings
+    )
 
 
 def build_dense_index(
@@ -149,9 +178,7 @@ def build_dense_index(
     model,
 ) -> faiss.IndexFlatIP:
     """
-    Embed all retrieval documents and build an exact FAISS index.
-
-    Normalized vectors + inner product = cosine similarity.
+    Embed complete battle JSON objects and build an exact FAISS index.
     """
 
     texts = [
@@ -160,7 +187,7 @@ def build_dense_index(
     ]
 
     print(
-        f"Embedding {len(texts)} retrieval documents..."
+        f"Embedding {len(texts)} JSON battle instances..."
     )
 
     embedding_batches: list[np.ndarray] = []
@@ -202,6 +229,11 @@ def build_dense_index(
             batch_embeddings
         )
 
+    if not embedding_batches:
+        raise ValueError(
+            "No battle JSON files were loaded."
+        )
+
     doc_embeddings = np.vstack(
         embedding_batches
     ).astype("float32")
@@ -232,7 +264,7 @@ def save_dense_index(
     docs: list[dict[str, Any]],
 ) -> None:
     """
-    Save the FAISS index and its document mapping.
+    Save the direct-JSON FAISS index and document mapping.
     """
 
     FAISS_INDEX_FILE.parent.mkdir(
@@ -273,7 +305,7 @@ def load_dense_index(
     list[dict[str, Any]],
 ]:
     """
-    Load the saved FAISS index and document mapping.
+    Load the saved direct-JSON FAISS index and mapping.
     """
 
     if not FAISS_INDEX_FILE.exists():
@@ -297,6 +329,13 @@ def load_dense_index(
         encoding="utf-8",
     ) as file:
         docs = json.load(file)
+
+    if index.ntotal != len(docs):
+        raise ValueError(
+            f"Index/mapping mismatch: "
+            f"{index.ntotal} vectors but "
+            f"{len(docs)} mapped documents."
+        )
 
     return index, docs
 
@@ -322,7 +361,7 @@ def dense_search(
     candidate_k: int,
 ) -> list[dict[str, Any]]:
     """
-    Retrieve the candidate-k battles using dense retrieval.
+    Retrieve candidate-k battles from the directly embedded JSON KB.
     """
 
     if not query.strip():
@@ -369,27 +408,34 @@ def dense_search(
             {
                 "rank": rank,
                 "battle_id": doc["battle_id"],
-                "name": doc["name"],
+                "name": doc.get("name"),
                 "score": float(
                     scores[0][rank - 1]
                 ),
-                "text": doc["text"],
-                "metadata": doc["metadata"],
+                "json": doc["json"],
             }
         )
 
     return results
 
 
-def create_index() -> None:
+def create_index(
+    limit: int | None = None,
+) -> None:
     """
-    Build and save the dense retrieval index.
+    Build and save the dense index directly from battle JSON files.
+
+    Set limit=10 for a quick test.
+    Leave limit=None for the full knowledge base.
     """
 
-    docs = load_retrieval_docs()
+    docs = load_json_battles()
+
+    if limit is not None:
+        docs = docs[:limit]
 
     print(
-        f"Loaded retrieval documents: {len(docs)}"
+        f"Loaded JSON battle instances: {len(docs)}"
     )
 
     model = load_embedding_model()
@@ -405,19 +451,21 @@ def create_index() -> None:
     )
 
 
-def test_search(candidate_k: int = 10) -> None:
+def test_search(
+    candidate_k: int = 10,
+    query: str = None,
+) -> list[dict[str, Any]]:
     """
-    Load the existing index and run a test query.
+    Load the direct-JSON index and run a test query.
     """
 
     model = load_embedding_model()
+
     index, docs = load_dense_index()
 
     print(
         f"Loaded vectors: {index.ntotal}"
     )
-
-    query = "Find battles involving a large coalition of several states where allied forces combined against a common enemy."
 
     results = dense_search(
         query=query,
@@ -445,9 +493,16 @@ def test_search(candidate_k: int = 10) -> None:
 
         print()
 
+    return results
+
 
 if __name__ == "__main__":
+    # Quick test:
+    #create_index(limit=10)
+
+    # Full direct-JSON index:
     #create_index()
 
     # After the index is created:
-    test_search(candidate_k=15)
+    query = "Find battles involving a large coalition of several states where allied forces combined against a common enemy."
+    test_search(candidate_k=15, query=query)

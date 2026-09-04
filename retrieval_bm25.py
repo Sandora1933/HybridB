@@ -8,44 +8,89 @@ from typing import Any
 from rank_bm25 import BM25Okapi
 
 
-RETRIEVAL_DOCS_FILE = Path(
-    "data/retrieval_docs/retrieval_docs_v1.jsonl"
+JSON_KB_DIR = Path(
+    "data/json_kb_v1"
 )
 
 
-def load_retrieval_docs(
-    file_path: Path = RETRIEVAL_DOCS_FILE,
-) -> list[dict[str, Any]]:
+def json_to_text(
+    battle: dict[str, Any],
+) -> str:
     """
-    Load retrieval documents from a JSONL file.
+    Serialize a full battle JSON object directly to text for BM25.
+
+    No intermediate retrieval-document projection is created.
+    Compact JSON is used to reduce unnecessary whitespace while
+    preserving all keys and values.
     """
 
-    if not file_path.exists():
+    return json.dumps(
+        battle,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+
+def load_json_battles(
+    directory: Path = JSON_KB_DIR,
+) -> list[dict[str, Any]]:
+    """
+    Load all Q*.json battle instances directly from the JSON knowledge base.
+    """
+
+    if not directory.exists():
         raise FileNotFoundError(
-            f"Retrieval docs file not found: "
-            f"{file_path.resolve()}"
+            f"JSON knowledge-base directory not found: "
+            f"{directory.resolve()}"
         )
+
+    json_files = sorted(
+        directory.glob("Q*.json"),
+        key=lambda path: int(path.stem[1:]),
+    )
 
     documents: list[dict[str, Any]] = []
 
-    with file_path.open(
-        "r",
-        encoding="utf-8",
-    ) as file:
-        for line_number, line in enumerate(file, start=1):
-            line = line.strip()
+    for file_path in json_files:
+        try:
+            with file_path.open(
+                "r",
+                encoding="utf-8",
+            ) as file:
+                battle = json.load(file)
 
-            if not line:
-                continue
+        except json.JSONDecodeError as error:
+            raise ValueError(
+                f"Invalid JSON file: {file_path} "
+                f"({error})"
+            ) from error
 
-            try:
-                document = json.loads(line)
-            except json.JSONDecodeError as error:
-                raise ValueError(
-                    f"Invalid JSON at line {line_number}: {error}"
-                ) from error
+        if not isinstance(battle, dict):
+            raise ValueError(
+                f"Expected JSON object in {file_path}, "
+                f"got {type(battle).__name__}."
+            )
 
-            documents.append(document)
+        battle_id = file_path.stem
+
+        identification = battle.get(
+            "identification",
+            {},
+        )
+
+        if not isinstance(identification, dict):
+            identification = {}
+
+        name = identification.get("name")
+
+        documents.append(
+            {
+                "battle_id": battle_id,
+                "name": name,
+                "json": battle,
+                "text": json_to_text(battle),
+            }
+        )
 
     return documents
 
@@ -68,13 +113,16 @@ def build_bm25_index(
     documents: list[dict[str, Any]],
 ) -> tuple[BM25Okapi, list[list[str]]]:
     """
-    Build a BM25 index over the retrieval document text fields.
+    Build a BM25 index directly over complete serialized battle JSON objects.
     """
 
-    tokenized_corpus = []
+    tokenized_corpus: list[list[str]] = []
 
     for document in documents:
-        text = document.get("text", "")
+        text = document.get(
+            "text",
+            "",
+        )
 
         if not isinstance(text, str):
             text = ""
@@ -83,8 +131,9 @@ def build_bm25_index(
             tokenize_text(text)
         )
 
-    # Build the BM25 index for my retrieval documents
-    bm25 = BM25Okapi(tokenized_corpus)
+    bm25 = BM25Okapi(
+        tokenized_corpus
+    )
 
     return bm25, tokenized_corpus
 
@@ -96,18 +145,31 @@ def retrieve_bm25(
     candidate_k: int,
 ) -> list[dict[str, Any]]:
     """
-    Retrieve the candidate-k battle documents using BM25.
+    Retrieve candidate-k battle JSON instances using BM25.
     """
 
     if not query.strip():
-        raise ValueError("Query must not be empty.")
+        raise ValueError(
+            "Query must not be empty."
+        )
 
     if candidate_k <= 0:
-        raise ValueError("candidate_k must be greater than 0.")
+        raise ValueError(
+            "candidate_k must be greater than 0."
+        )
 
-    tokenized_query = tokenize_text(query)
+    candidate_k = min(
+        candidate_k,
+        len(documents),
+    )
 
-    scores = bm25.get_scores(tokenized_query)
+    tokenized_query = tokenize_text(
+        query
+    )
+
+    scores = bm25.get_scores(
+        tokenized_query
+    )
 
     ranked_indices = sorted(
         range(len(scores)),
@@ -115,38 +177,63 @@ def retrieve_bm25(
         reverse=True,
     )[:candidate_k]
 
-    results = []
+    results: list[dict[str, Any]] = []
 
-    for rank, index in enumerate(
+    for rank, index_position in enumerate(
         ranked_indices,
         start=1,
     ):
-        document = documents[index]
+        document = documents[
+            index_position
+        ]
 
         results.append(
             {
                 "rank": rank,
-                "score": float(scores[index]),
-                "battle_id": document.get("battle_id"),
-                "name": document.get("name"),
-                "text": document.get("text"),
-                "metadata": document.get("metadata"),
+                "score": float(
+                    scores[index_position]
+                ),
+                "battle_id": document.get(
+                    "battle_id"
+                ),
+                "name": document.get(
+                    "name"
+                ),
+                "json": document.get(
+                    "json"
+                ),
             }
         )
 
     return results
 
 
-def test_bm25(candidate_k: int = 10) -> None:
-    # collections of retrieval documents as jsons
-    documents = load_retrieval_docs()
+def test_bm25(
+    candidate_k: int = 10,
+    query: str | None = None,
+    limit: int | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Load the JSON knowledge base, build BM25 directly over full JSON records,
+    run a test query, print results, and return the ranked result list.
+
+    Set limit=10 for a quick test.
+    Leave limit=None to use the full knowledge base.
+    """
+
+    documents = load_json_battles()
+
+    if limit is not None:
+        documents = documents[:limit]
 
     print(
-        f"Loaded retrieval documents: {len(documents)}"
+        f"Loaded JSON battle instances: "
+        f"{len(documents)}"
     )
 
-    bm25, _ = build_bm25_index(documents)
-    query = "Find battles involving war elephants where the elephants were used in the main battle but did not secure victory."
+    bm25, _ = build_bm25_index(
+        documents
+    )
 
     results = retrieve_bm25(
         query=query,
@@ -155,7 +242,9 @@ def test_bm25(candidate_k: int = 10) -> None:
         candidate_k=candidate_k,
     )
 
-    print(f"\nQuery: {query}\n")
+    print()
+    print(f"Query: {query}")
+    print()
 
     for result in results:
         print(
@@ -163,8 +252,25 @@ def test_bm25(candidate_k: int = 10) -> None:
             f"{result['name']} "
             f"({result['battle_id']})"
         )
-        print(f"   BM25 score: {result['score']:.4f}\n")
+
+        print(
+            f"   BM25 score: "
+            f"{result['score']:.4f}"
+        )
+
+        print()
+
+    return results
 
 
 if __name__ == "__main__":
-    test_bm25(candidate_k=30)
+    query = (
+        "Find battles involving war elephants "
+        "where the elephants were used in the main battle "
+        "but did not secure victory."
+    )
+
+    test_bm25(
+        candidate_k=30,
+        query=query,
+    )
