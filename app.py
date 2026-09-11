@@ -9,7 +9,7 @@ from prompts import (
     build_baseline_prompt,
     build_json_augmented_prompt
 )
-from evaluate import evaluate_model_answer
+from evaluate_closed_set_metrics import evaluate_model_answer
 
 RESULTS_DIR = "results"
 

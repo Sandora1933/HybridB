@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import Any
 
 
-BATTLE_JSON_DIR = Path("data/json_kb_v1")
-OUTPUT_FILE = Path("data/retrieval_docs/retrieval_docs_v1.jsonl")
+BATTLE_JSON_DIR = Path("data/json_kb_v2")
+OUTPUT_FILE = Path("data/retrieval_docs/retrieval_docs_v2_7000_8000.jsonl")
 
-NUMBER_OF_BATTLES = None
+START_INDEX = 7000
+NUMBER_OF_BATTLES = 1000
 
 # Keep retrieval docs compact enough for indexing, but rich enough for event-centric queries.
 MAX_EVENT_ITEMS = 8
@@ -774,7 +775,7 @@ def main() -> None:
         key=lambda path: int(path.stem[1:]),
     )
 
-    json_files = json_files[:NUMBER_OF_BATTLES]
+    json_files = json_files[START_INDEX:START_INDEX + NUMBER_OF_BATTLES]
 
     print(f"Battle JSON files selected: {len(json_files)}")
 

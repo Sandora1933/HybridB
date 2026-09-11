@@ -21,75 +21,65 @@ from retrieval_hybrid import reciprocal_rank_fusion
 
 
 QUERIES_FILE = Path(
-    "data/queries/queries_retrieval.json"
+    "data/queries/queries_all.json"
 )
 
 REPORT_FILE = Path(
     "data/evaluation/retrieval_experiment_report.json"
 )
 
+AVERAGE_METRICS_FILE = Path(
+    "data/evaluation/retrieval_experiment_average_metrics.json"
+)
+
 CANDIDATE_K = 100
 HYBRID_TOP_K = 50
 
 
-def _extract_battle_names(
+def _extract_battle_ids(
     retrieved_battles: list[Any],
 ) -> list[str]:
     """
-    Convert retrieval results into a list of battle names.
+    Extract battle QIDs from ranked retrieval results.
     """
 
-    names: list[str] = []
+    battle_ids: list[str] = []
 
     for item in retrieved_battles:
-        if isinstance(item, str):
-            names.append(item)
+        if isinstance(item, dict):
+            battle_id = item.get("battle_id")
 
-        elif isinstance(item, dict):
-            name = item.get("name")
+            if isinstance(battle_id, str):
+                battle_ids.append(
+                    battle_id.strip()
+                )
 
-            if isinstance(name, str):
-                names.append(name)
-
-    return names
-
-
-def _normalize_name(
-    name: str,
-) -> str:
-    """
-    Normalize battle names for exact matching.
-    """
-
-    return name.strip().casefold()
+    return battle_ids
 
 
 def _prepare_sets(
     retrieved_battles: list[Any],
-    golden_battles: list[str],
+    golden_battles: dict[str, str],
 ) -> tuple[list[str], set[str]]:
     """
-    Prepare normalized retrieved ranking and gold set.
+    Prepare retrieved QID ranking and gold QID set.
+
+    Evaluation is performed by QID rather than battle name.
     """
 
-    retrieved_names = [
-        _normalize_name(name)
-        for name in _extract_battle_names(
-            retrieved_battles
-        )
-    ]
+    retrieved_ids = _extract_battle_ids(
+        retrieved_battles
+    )
 
-    gold_set = {
-        _normalize_name(name)
-        for name in golden_battles
-    }
+    gold_ids = set(
+        golden_battles.keys()
+    )
 
-    return retrieved_names, gold_set
-
+    return retrieved_ids, gold_ids
 
 def eval_recall_at_k(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
     k: int,
 ) -> float:
     """
@@ -117,7 +107,7 @@ def eval_recall_at_k(
 
 def eval_recall_10(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> float:
     return eval_recall_at_k(
         algorithm_retrieved_battles_list,
@@ -128,7 +118,7 @@ def eval_recall_10(
 
 def eval_recall_20(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> float:
     return eval_recall_at_k(
         algorithm_retrieved_battles_list,
@@ -139,7 +129,7 @@ def eval_recall_20(
 
 def eval_recall_50(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> float:
     return eval_recall_at_k(
         algorithm_retrieved_battles_list,
@@ -150,7 +140,7 @@ def eval_recall_50(
 
 def eval_precision_10(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> float:
     """
     Precision@10.
@@ -177,7 +167,7 @@ def eval_precision_10(
 
 def eval_mrr(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> float:
     """
     Reciprocal Rank for one query.
@@ -202,7 +192,7 @@ def eval_mrr(
 
 def eval_map_10(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> float:
     """
     Average Precision@10 for one query.
@@ -246,7 +236,7 @@ def eval_map_10(
 
 def eval_ndcg_10(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> float:
     """
     Binary nDCG@10.
@@ -295,7 +285,7 @@ def eval_ndcg_10(
 
 def evaluate_query(
     algorithm_retrieved_battles_list: list[Any],
-    golden_battles_list: list[str],
+    golden_battles_list: dict[str, str],
 ) -> dict[str, float]:
     """
     Calculate all retrieval metrics for one query.
@@ -323,10 +313,6 @@ def evaluate_query(
             golden_battles_list,
         ),
         "nDCG@10": eval_ndcg_10(
-            algorithm_retrieved_battles_list,
-            golden_battles_list,
-        ),
-        "Precision@10": eval_precision_10(
             algorithm_retrieved_battles_list,
             golden_battles_list,
         ),
@@ -366,13 +352,20 @@ def single_query_retrieval_report(
     return {
         "query_id": query_item.get("query_id"),
         "query": query_item.get("query"),
+        "generation_query": query_item.get("generation_query"),
         "query_type": query_item.get("query_type"),
         "query_structure": query_item.get("query_structure"),
         "query_difficulty": query_item.get("query_difficulty"),
+        "context_rarity": query_item.get("context_rarity"),
         "gold_battles": query_item.get(
             "gold_battles",
-            [],
+            {},
         ),
+        "closed_set_negatives": query_item.get(
+            "closed_set_negatives",
+            {},
+        ),
+        "explanation": query_item.get("explanation"),
         "results": [
             {
                 "algorithm": "bm25",
@@ -589,7 +582,7 @@ def main() -> None:
         Hybrid RRF top_k = 50
     """
 
-    queries = load_queries()[:1]
+    queries = load_queries()[70:]
 
     print(
         f"Loaded evaluation queries: "
@@ -718,6 +711,23 @@ def main() -> None:
         f"Final report saved to: "
         f"{REPORT_FILE.resolve()}"
     )
+
+    # Save average metrics to JSON
+    AVERAGE_METRICS_FILE.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    with AVERAGE_METRICS_FILE.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(
+            average_metrics,
+            file,
+            ensure_ascii=False,
+            indent=4,
+        )
 
 
 if __name__ == "__main__":

@@ -34,8 +34,8 @@ FAILED_LOG_FILE = Path(
 # Run configuration
 # ============================================================
 
-START_FILE_INDEX = 4500
-NUMBER_OF_FILES: int | None = 100 # 4600 
+START_FILE_INDEX = 10856
+NUMBER_OF_FILES: int | None = 11561-START_FILE_INDEX
 
 REQUEST_DELAY_SECONDS = 0.7
 MAX_RETRIES = 3
