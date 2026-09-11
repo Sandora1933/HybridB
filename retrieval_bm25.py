@@ -8,8 +8,12 @@ from typing import Any
 from rank_bm25 import BM25Okapi
 
 
-JSON_KB_DIR = Path(
+JSON_KB1_DIR = Path(
     "data/json_kb_v1"
+)
+
+JSON_KB2_DIR = Path(
+    "data/json_kb_v2"
 )
 
 
@@ -32,11 +36,16 @@ def json_to_text(
 
 
 def load_json_battles(
-    directory: Path = JSON_KB_DIR,
+    use_kb_2: bool = False,
 ) -> list[dict[str, Any]]:
     """
     Load all Q*.json battle instances directly from the JSON knowledge base.
     """
+
+    if use_kb_2:
+        directory = JSON_KB2_DIR
+    else:
+        directory = JSON_KB1_DIR
 
     if not directory.exists():
         raise FileNotFoundError(

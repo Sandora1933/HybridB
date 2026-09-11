@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
+
+from matplotlib import pyplot as plt
+import numpy as np
 
 from retrieval_bm25 import (
     load_json_battles,
@@ -17,24 +20,73 @@ from retrieval_dense import (
     dense_search,
 )
 
-from retrieval_hybrid import reciprocal_rank_fusion
-
+from retrieval_hybrid import reciprocal_rank_fusion 
 
 QUERIES_FILE = Path(
     "data/queries/queries_all.json"
 )
 
-REPORT_FILE = Path(
-    "data/evaluation/retrieval_experiment_report.json"
+REPORT_FILE_KB1 = Path(
+    "data/evaluation/retrieval_experiment_report_kb1.json"
 )
 
-AVERAGE_METRICS_FILE = Path(
-    "data/evaluation/retrieval_experiment_average_metrics.json"
+REPORT_FILE_KB2 = Path(
+    "data/evaluation/retrieval_experiment_report_kb2.json"
 )
+
+AVERAGE_METRICS_FILE_KB1 = Path(
+    "data/evaluation/retrieval_experiment_average_metrics_kb1.json"
+)
+
+AVERAGE_METRICS_FILE_KB2 = Path(
+    "data/evaluation/retrieval_experiment_average_metrics_kb2.json"
+)
+
 
 CANDIDATE_K = 100
 HYBRID_TOP_K = 50
 
+
+def _filter_queries_by_rarity(
+    queries: list[dict[str, Any]],
+    rarity: Literal["common", "rare"],
+) -> list[dict[str, Any]]:
+    return [
+        query
+        for query in queries
+        if query.get("context_rarity") == rarity
+    ]
+
+
+def _filter_queries_by_difficulty(
+    queries: list[dict[str, Any]],
+    difficulty: Literal["easy", "medium", "hard"],
+) -> list[dict[str, Any]]:
+    """Filter queries by difficulty: 'easy', 'medium', or 'hard'."""
+    return [
+        query
+        for query in queries
+        if query.get("query_difficulty") == difficulty
+    ]
+
+def _filter_queries_by_type(
+    queries: list[dict[str, Any]],
+    query_type: Literal[
+        "Participant-related",
+        "Similarity",
+        "Narrative / Tactical",
+        "Temporal",
+        "Spatial / Terrain",
+        "Outcome-related",
+        "Weapon / Unit-related",
+    ],
+) -> list[dict[str, Any]]:
+    """Filter queries by query type."""
+    return [
+        query
+        for query in queries
+        if query.get("query_type") == query_type
+    ]
 
 def _extract_battle_ids(
     retrieved_battles: list[Any],
@@ -394,7 +446,7 @@ def single_query_retrieval_report(
 
 def save_retrieval_report(
     reports: list[dict[str, Any]],
-    output_file: Path = REPORT_FILE,
+    output_file: Path = REPORT_FILE_KB1,
 ) -> None:
     """
     Save all completed query reports.
@@ -566,6 +618,50 @@ def calculate_average_metrics(
     }
 
 
+def plot_metric(
+    metric_name: str,
+    kb1_file: Path = AVERAGE_METRICS_FILE_KB1,
+    #kb2_file: Path = AVERAGE_METRICS_FILE_KB2,
+) -> None:
+    """Plot a selected retrieval metric for BM25, dense, and hybrid."""
+
+    with kb1_file.open("r", encoding="utf-8") as f:
+        kb1_results = json.load(f)
+
+    #with kb2_file.open("r", encoding="utf-8") as f:
+    #    kb2_results = json.load(f)
+
+    labels = ["KB1", "KB2"]
+    methods = ["bm25", "dense", "hybrid"]
+
+    x = np.arange(len(labels))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    for i, method in enumerate(methods):
+        values = [
+            kb1_results[method][metric_name],
+            #kb2_results[method][metric_name],
+        ]
+
+        ax.bar(
+            x + (i - 1) * width,
+            values,
+            width,
+            label=method,
+        )
+
+    ax.set_ylabel(metric_name)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0.0, 1.0)
+    ax.legend()
+
+    fig.tight_layout()
+    plt.show()
+
+
 def main() -> None:
     """
     Run all retrieval experiments.
@@ -582,7 +678,13 @@ def main() -> None:
         Hybrid RRF top_k = 50
     """
 
-    queries = load_queries()[70:]
+    queries = load_queries()
+    queries = _filter_queries_by_rarity(
+        queries=queries,
+        rarity="common", # or rare
+    )
+    
+    use_kb_2 = False
 
     print(
         f"Loaded evaluation queries: "
@@ -595,7 +697,7 @@ def main() -> None:
 
     print("\nLoading JSON knowledge base for BM25...")
 
-    bm25_documents = load_json_battles()
+    bm25_documents = load_json_battles(use_kb_2=use_kb_2)
 
     print(
         f"Loaded BM25 documents: "
@@ -619,7 +721,7 @@ def main() -> None:
     print("Loading existing FAISS dense index...")
 
     dense_index, dense_documents = (
-        load_dense_index()
+        load_dense_index(use_kb_2=use_kb_2)
     )
 
     print(
@@ -676,8 +778,15 @@ def main() -> None:
             query_report
         )
 
+        if use_kb_2:
+            report_file = REPORT_FILE_KB2
+            average_metrics_file = AVERAGE_METRICS_FILE_KB2
+        else:
+            report_file = REPORT_FILE_KB1
+            average_metrics_file = AVERAGE_METRICS_FILE_KB1
+
         # Save after each completed query.
-        save_retrieval_report(all_reports)
+        save_retrieval_report(all_reports, output_file=report_file)
 
         print(
             f"Saved {len(all_reports)} "
@@ -709,16 +818,16 @@ def main() -> None:
     print()
     print(
         f"Final report saved to: "
-        f"{REPORT_FILE.resolve()}"
+        f"{report_file.resolve()}"
     )
 
     # Save average metrics to JSON
-    AVERAGE_METRICS_FILE.parent.mkdir(
+    average_metrics_file.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    with AVERAGE_METRICS_FILE.open(
+    with average_metrics_file.open(
         "w",
         encoding="utf-8",
     ) as file:
@@ -731,4 +840,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    plot_metric("Recall@10")

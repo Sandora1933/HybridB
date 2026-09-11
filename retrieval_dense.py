@@ -10,16 +10,28 @@ import numpy as np
 from llm import load_llm
 
 
-JSON_KB_DIR = Path(
+JSON_KB1_DIR = Path(
     "data/json_kb_v1"
 )
 
-FAISS_INDEX_FILE = Path(
-    "data/dense_index/qwen3_embedding_4b_direct.index"
+JSON_KB2_DIR = Path(
+    "data/json_kb_v2"
 )
 
-DOC_MAPPING_FILE = Path(
-    "data/dense_index/doc_mapping_direct.json"
+FAISS_INDEX_FILE_KB1 = Path(
+    "data/dense_index/qwen3_embedding_4b_kb1.index"
+)
+
+FAISS_INDEX_FILE_KB2 = Path(
+    "data/dense_index/qwen3_embedding_4b_kb2.index"
+)
+
+DOC_MAPPING_FILE_KB1 = Path(
+    "data/dense_index/doc_mapping_kb1.json"
+)
+
+DOC_MAPPING_FILE_KB2 = Path(
+    "data/dense_index/doc_mapping_kb2.json"
 )
 
 MODEL_NAME = "Qwen/Qwen3-Embedding-4B"
@@ -51,11 +63,16 @@ def json_to_text(
 
 
 def load_json_battles(
-    directory: Path = JSON_KB_DIR,
+    use_kb_2: bool = False,
 ) -> list[dict[str, Any]]:
     """
     Load all Q*.json battle instances directly from the JSON knowledge base.
     """
+
+    if use_kb_2:
+        directory = JSON_KB2_DIR
+    else:
+        directory = JSON_KB1_DIR
 
     if not directory.exists():
         raise FileNotFoundError(
@@ -262,22 +279,30 @@ def build_dense_index(
 def save_dense_index(
     index: faiss.Index,
     docs: list[dict[str, Any]],
+    use_kb_2: bool = False,
 ) -> None:
     """
     Save the direct-JSON FAISS index and document mapping.
     """
 
-    FAISS_INDEX_FILE.parent.mkdir(
+    if use_kb_2:
+        faiss_index_file = FAISS_INDEX_FILE_KB2
+        doc_mapping_file = DOC_MAPPING_FILE_KB2
+    else:
+        faiss_index_file = FAISS_INDEX_FILE_KB1
+        doc_mapping_file = DOC_MAPPING_FILE_KB1
+
+    faiss_index_file.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
     faiss.write_index(
         index,
-        str(FAISS_INDEX_FILE),
+        str(faiss_index_file),
     )
 
-    with DOC_MAPPING_FILE.open(
+    with doc_mapping_file.open(
         "w",
         encoding="utf-8",
     ) as file:
@@ -290,16 +315,17 @@ def save_dense_index(
 
     print(
         f"FAISS index saved to: "
-        f"{FAISS_INDEX_FILE.resolve()}"
+        f"{faiss_index_file.resolve()}"
     )
 
     print(
         f"Document mapping saved to: "
-        f"{DOC_MAPPING_FILE.resolve()}"
+        f"{doc_mapping_file.resolve()}"
     )
 
 
 def load_dense_index(
+    use_kb_2: bool = False,
 ) -> tuple[
     faiss.Index,
     list[dict[str, Any]],
@@ -308,23 +334,30 @@ def load_dense_index(
     Load the saved direct-JSON FAISS index and mapping.
     """
 
-    if not FAISS_INDEX_FILE.exists():
+    if use_kb_2:
+        faiss_index_file = FAISS_INDEX_FILE_KB2
+        doc_mapping_file = DOC_MAPPING_FILE_KB2
+    else:
+        faiss_index_file = FAISS_INDEX_FILE_KB1
+        doc_mapping_file = DOC_MAPPING_FILE_KB1
+
+    if not faiss_index_file.exists():
         raise FileNotFoundError(
             f"FAISS index not found: "
-            f"{FAISS_INDEX_FILE.resolve()}"
+            f"{faiss_index_file.resolve()}"
         )
 
-    if not DOC_MAPPING_FILE.exists():
+    if not doc_mapping_file.exists():
         raise FileNotFoundError(
             f"Document mapping not found: "
-            f"{DOC_MAPPING_FILE.resolve()}"
+            f"{doc_mapping_file.resolve()}"
         )
 
     index = faiss.read_index(
-        str(FAISS_INDEX_FILE)
+        str(faiss_index_file)
     )
 
-    with DOC_MAPPING_FILE.open(
+    with doc_mapping_file.open(
         "r",
         encoding="utf-8",
     ) as file:
@@ -420,6 +453,7 @@ def dense_search(
 
 
 def create_index(
+    use_kb_2: bool = False,
     limit: int | None = None,
 ) -> None:
     """
@@ -429,7 +463,7 @@ def create_index(
     Leave limit=None for the full knowledge base.
     """
 
-    docs = load_json_battles()
+    docs = load_json_battles(use_kb_2=use_kb_2)
 
     if limit is not None:
         docs = docs[:limit]
@@ -446,6 +480,7 @@ def create_index(
     )
 
     save_dense_index(
+        use_kb_2=use_kb_2,
         index=index,
         docs=docs,
     )
@@ -500,8 +535,11 @@ if __name__ == "__main__":
     # Quick test:
     #create_index(limit=10)
 
-    # Full direct-JSON index:
-    #create_index()
+    # Full index for KB1:
+    #create_index(use_kb_2=False)
+
+    # Full index for KB2:
+    #create_index(use_kb_2=True)
 
     # After the index is created:
     query = "Find battles involving a large coalition of several states where allied forces combined against a common enemy."
