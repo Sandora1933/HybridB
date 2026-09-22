@@ -618,24 +618,165 @@ def calculate_average_metrics(
     }
 
 
+def plot_metric_query_type(
+        metric_name: str,
+        results_weapon_file: Path = Path("data/evaluation/retrieval_experiment_average_metrics_weapon.json"),
+        results_outcome_file: Path = Path("data/evaluation/retrieval_experiment_average_metrics_outcome.json"),
+        results_narrative_file: Path = Path("data/evaluation/retrieval_experiment_average_metrics_narrative.json"),
+) -> None:
+    """Plot a selected retrieval metric for BM25, dense, and hybrid
+    across different query types.
+    """
+
+    # Load results
+    with results_weapon_file.open("r", encoding="utf-8") as f:
+        weapon_results = json.load(f)
+
+    with results_outcome_file.open("r", encoding="utf-8") as f:
+        outcome_results = json.load(f)
+
+    with results_narrative_file.open("r", encoding="utf-8") as f:
+        narrative_results = json.load(f)
+
+    labels = ["Weapon / Unit-related", "Outcome-related", "Narrative / Tactical"]
+    methods = ["bm25", "dense", "hybrid"]
+
+    results = [
+        weapon_results,
+        outcome_results,
+        narrative_results,
+    ]
+
+    x = np.arange(len(labels))
+    width = 0.24
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    for i, method in enumerate(methods):
+        values = [
+            result[method][metric_name]
+            for result in results
+        ]
+
+        ax.bar(
+            x + (i - 1) * width,
+            values,
+            width,
+            label=method.upper() if method == "bm25" else method.capitalize(),
+        )
+
+    ax.set_ylabel(metric_name)
+    ax.set_xlabel("Query Type")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+
+    # Same y-axis logic as before
+    if metric_name.startswith("Recall"):
+        ylim_start = 0.3
+        ylim_end = 0.9
+    else:
+        ylim_start = 0.1
+        ylim_end = 0.8
+
+    ax.set_ylim(ylim_start, ylim_end)
+
+    ax.legend()
+    ax.grid(axis="y", alpha=0.25)
+
+    fig.tight_layout()
+    plt.show()
+
+
+
+def plot_metric_three_files(
+    metric_name: str,
+    easy_file: Path = Path("data/evaluation/retrieval_experiment_average_metrics_easy.json"),
+    medium_file: Path = Path("data/evaluation/retrieval_experiment_average_metrics_medium.json"),
+    hard_file: Path = Path("data/evaluation/retrieval_experiment_average_metrics_hard.json"),
+) -> None:
+    """Plot a selected retrieval metric for BM25, dense, and hybrid
+    across easy, medium, and hard queries.
+    """
+
+    # Load results
+    with easy_file.open("r", encoding="utf-8") as f:
+        easy_results = json.load(f)
+
+    with medium_file.open("r", encoding="utf-8") as f:
+        medium_results = json.load(f)
+
+    with hard_file.open("r", encoding="utf-8") as f:
+        hard_results = json.load(f)
+
+    labels = ["Easy", "Medium", "Hard"]
+    methods = ["bm25", "dense", "hybrid"]
+
+    results = [
+        easy_results,
+        medium_results,
+        hard_results,
+    ]
+
+    x = np.arange(len(labels))
+    width = 0.22
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    for i, method in enumerate(methods):
+        values = [
+            result[method][metric_name]
+            for result in results
+        ]
+
+        ax.bar(
+            x + (i - 1) * width,
+            values,
+            width,
+            label=method.upper() if method == "bm25" else method.capitalize(),
+        )
+
+    ax.set_ylabel(metric_name)
+    ax.set_xlabel("Query Difficulty")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+
+    # Same y-axis logic as before
+    if metric_name.startswith("Recall"):
+        ylim_start = 0.4
+        ylim_end = 1.0
+    else:
+        ylim_start = 0.2
+        ylim_end = 0.9
+
+    ax.set_ylim(ylim_start, ylim_end)
+
+    ax.legend()
+    ax.grid(axis="y", alpha=0.25)
+
+    fig.tight_layout()
+    plt.show()
+
+
 def plot_metric(
     metric_name: str,
-    kb1_file: Path = AVERAGE_METRICS_FILE_KB1,
-    #kb2_file: Path = AVERAGE_METRICS_FILE_KB2,
+    file1: Path = AVERAGE_METRICS_FILE_KB1,
+    #file2: Path = AVERAGE_METRICS_FILE_KB2,
 ) -> None:
     """Plot a selected retrieval metric for BM25, dense, and hybrid."""
 
-    with kb1_file.open("r", encoding="utf-8") as f:
+    with file1.open("r", encoding="utf-8") as f:
         kb1_results = json.load(f)
 
-    #with kb2_file.open("r", encoding="utf-8") as f:
+    #with file2.open("r", encoding="utf-8") as f:
     #    kb2_results = json.load(f)
 
-    labels = ["KB1", "KB2"]
+    labels = ["similarity"]
     methods = ["bm25", "dense", "hybrid"]
 
     x = np.arange(len(labels))
-    width = 0.25
+    width = 0.2
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -655,7 +796,15 @@ def plot_metric(
     ax.set_ylabel(metric_name)
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
-    ax.set_ylim(0.0, 1.0)
+
+    if metric_name.startswith("Recall"):
+        ylim_start = 0
+        ylim_end = 0.6
+    else:
+        ylim_start = 0
+        ylim_end = 0.4
+
+    ax.set_ylim(ylim_start, ylim_end)
     ax.legend()
 
     fig.tight_layout()
@@ -679,12 +828,25 @@ def main() -> None:
     """
 
     queries = load_queries()
-    queries = _filter_queries_by_rarity(
+    # queries = _filter_queries_by_rarity(
+    #     queries=queries,
+    #     rarity="common", # or rare
+    # )
+    # queries = _filter_queries_by_difficulty(
+    #     queries=queries,
+    #     difficulty="hard", # or easy, medium, hard
+    # )
+    queries = _filter_queries_by_type(
         queries=queries,
-        rarity="common", # or rare
+        query_type="Similarity", # or Participant-related, Similarity, Narrative / Tactical, Temporal, Spatial / Terrain, Outcome-related, Weapon / Unit-related
     )
-    
-    use_kb_2 = False
+
+    use_kb_2 = True
+
+    print(
+        f"Using knowledge base: "
+        f"{'KB2' if use_kb_2 else 'KB1'}"
+    )
 
     print(
         f"Loaded evaluation queries: "
@@ -841,4 +1003,16 @@ def main() -> None:
 
 if __name__ == "__main__":
     #main()
-    plot_metric("Recall@10")
+    # plot_metric(
+    #     "nDCG@10",
+    #     file1=Path("data/evaluation/retrieval_experiment_average_metrics_kb1.json"),
+    #     file2=Path("data/evaluation/retrieval_experiment_average_metrics_kb2.json")
+    # )
+    # plot_metric(
+    #     "nDCG@10",
+    #     file1=Path("data/evaluation/retrieval_experiment_average_metrics_common.json"),
+    #     file2=Path("data/evaluation/retrieval_experiment_average_metrics_rare.json")
+    # )
+    #plot_metric_three_files("MRR")
+    #plot_metric_query_type("Recall@10")
+    plot_metric(file1=Path("data/evaluation/retrieval_experiment_average_metrics_similarity.json"), metric_name="nDCG@10")

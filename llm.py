@@ -72,6 +72,14 @@ class ScadsChatModel:
         choice = response.choices[0]
         message = choice.message
 
+        if choice.finish_reason == "length":
+            print("Raw response:")
+            print(response.model_dump_json(indent=2))
+
+            raise RuntimeError(
+                "Generation stopped because max token limit was reached."
+            )
+
         content = message.content
 
         if content is None:
@@ -93,7 +101,7 @@ def generate_answer(
     llm,
     prompt,
     system_message=None,
-    max_new_tokens=1024,
+    max_new_tokens=4000,
     do_sample=False,
     temperature=None,
     top_p=None
