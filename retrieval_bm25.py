@@ -216,6 +216,62 @@ def retrieve_bm25(
 
     return results
 
+def explain_bm25_match(
+    query: str,
+    bm25: BM25Okapi,
+    document: dict[str, Any],
+    document_index: int,
+) -> list[dict[str, Any]]:
+
+    query_tokens = tokenize_text(query)
+
+    doc_freqs = bm25.doc_freqs[document_index]
+    doc_len = bm25.doc_len[document_index]
+
+    explanations = []
+
+    for token in query_tokens:
+        if token not in doc_freqs:
+            continue
+
+        tf = doc_freqs[token]
+        idf = bm25.idf.get(token, 0.0)
+
+        denominator = (
+            tf
+            + bm25.k1
+            * (
+                1
+                - bm25.b
+                + bm25.b
+                * doc_len
+                / bm25.avgdl
+            )
+        )
+
+        contribution = (
+            idf
+            * tf
+            * (bm25.k1 + 1)
+            / denominator
+        )
+
+        explanations.append(
+            {
+                "token": token,
+                "tf": tf,
+                "idf": idf,
+                "contribution": contribution,
+            }
+        )
+
+    explanations.sort(
+        key=lambda item: item["contribution"],
+        reverse=True,
+    )
+
+    return explanations
+
 
 def test_bm25(
     candidate_k: int = 10,

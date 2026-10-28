@@ -827,7 +827,7 @@ def main() -> None:
         Hybrid RRF top_k = 50
     """
 
-    queries = load_queries()
+    queries = load_queries()[:1]
     # queries = _filter_queries_by_rarity(
     #     queries=queries,
     #     rarity="common", # or rare
@@ -836,10 +836,10 @@ def main() -> None:
     #     queries=queries,
     #     difficulty="hard", # or easy, medium, hard
     # )
-    queries = _filter_queries_by_type(
-        queries=queries,
-        query_type="Similarity", # or Participant-related, Similarity, Narrative / Tactical, Temporal, Spatial / Terrain, Outcome-related, Weapon / Unit-related
-    )
+    # queries = _filter_queries_by_type(
+    #     queries=queries,
+    #     query_type="Similarity", # or Participant-related, Similarity, Narrative / Tactical, Temporal, Spatial / Terrain, Outcome-related, Weapon / Unit-related
+    # )
 
     use_kb_2 = True
 
@@ -1002,7 +1002,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    #main()
+    main()
     # plot_metric(
     #     "nDCG@10",
     #     file1=Path("data/evaluation/retrieval_experiment_average_metrics_kb1.json"),
@@ -1015,4 +1015,4 @@ if __name__ == "__main__":
     # )
     #plot_metric_three_files("MRR")
     #plot_metric_query_type("Recall@10")
-    plot_metric(file1=Path("data/evaluation/retrieval_experiment_average_metrics_similarity.json"), metric_name="nDCG@10")
+    #plot_metric(file1=Path("data/evaluation/retrieval_experiment_average_metrics_similarity.json"), metric_name="nDCG@10")
