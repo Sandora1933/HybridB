@@ -4,6 +4,10 @@ extracted_wikidata/
 extracted_wikipedia/
 __pycache__/
 .env
-data/
+/data/*
 old_data/
 results/
+
+# Except ZIP archives
+!/data/json_kb_v1.zip
+!/data/json_kb_v2.zip
